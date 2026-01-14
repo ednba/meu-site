@@ -1,0 +1,1667 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Rotina Viva</title>
+
+<style>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #0f172a;
+  color: #e5e7eb;
+}
+
+header {
+  background: #020617;
+  padding: 15px;
+  text-align: center;
+}
+
+header h1 {
+  margin: 0;
+  font-size: 20px;
+}
+
+header p {
+  margin: 5px 0 0;
+  color: #38bdf8;
+}
+
+.container {
+  padding: 15px;
+  overflow-y: auto;
+  height: calc(100vh - 120px);
+}
+
+.task {
+  background: #020617;
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 12px;
+}
+
+.task.active {
+  border: 2px solid #22c55e;
+}
+
+.task-header {
+  cursor: pointer;
+}
+
+.time {
+  color: #facc15;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.short {
+  margin-top: 6px;
+  font-size: 15px;
+}
+
+.details {
+  margin-top: 10px;
+  border-top: 1px solid #1e293b;
+  padding-top: 10px;
+  font-size: 14px;
+  line-height: 1.6;
+  max-height: 260px;
+  overflow-y: auto;
+  display: none;
+
+  /* importante: permite rolar dentro sem fechar */
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
+}
+
+.task.open .details {
+  display: block;
+}
+
+footer {
+  background: #020617;
+  text-align: center;
+  padding: 10px;
+  font-size: 14px;
+  color: #94a3b8;
+}
+.smallhint {
+  font-size: 12px;
+  color: #64748b;
+  margin-top: 6px;
+}
+.error {
+  background: #7f1d1d;
+  color: #fee2e2;
+  padding: 10px;
+  border-radius: 10px;
+  margin: 15px;
+  font-size: 14px;
+  line-height: 1.4;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>Rotina Viva</h1>
+  <p id="day">Carregando…</p>
+  <div class="smallhint" id="hint"></div>
+</header>
+
+<div class="container" id="tasks"></div>
+
+<footer>
+  ← Deslize para direita ou esquerda para mudar o dia →
+</footer>
+
+<script>
+/**
+ * AGORA É TUDO EM UM ARQUIVO (sem semana.md)
+ * O conteúdo abaixo substitui o semana.md
+ */
+const SEMANA_MD = `
+## Segunda-feira
+
+### 06:00 — Acordar com calma
+Emoções  
+O que aparece ao acordar?  
+tensão  
+preguiça  
+tranquilidade  
+ansiedade leve  
+neutralidade  
+👉 Apenas nomear.
+
+Pensamentos recorrentes  
+“não quero começar correndo”  
+“preciso de silêncio”  
+“o dia ainda não começou”  
+👉 Observar, não resolver.
+
+Ajustes internos  
+acordar 5–10 min antes  
+reduzir estímulos  
+evitar celular  
+👉 Microajustes.
+
+O que NÃO é  
+Não é planejar o dia.  
+Não é resolver problemas.  
+Não é se cobrar.
+
+Função interna  
+Regular o sistema nervoso e iniciar a semana sem entrar em modo de defesa.
+
+Frase-resumo  
+O dia começa no corpo, não na cabeça.
+
+---
+
+### 07:00 — Higiene, vitaminas e ordem mínima
+Emoções  
+estabilidade  
+irritação leve  
+presença  
+resistência  
+👉 Nomear.
+
+Pensamentos recorrentes  
+“quando o ambiente está melhor eu fico melhor”  
+“não precisa ficar perfeito”  
+👉 Observar.
+
+Ajustes internos  
+organizar só o essencial  
+limitar tempo  
+não buscar controle total  
+
+O que NÃO é  
+Não é faxina completa.  
+Não é procrastinação disfarçada.
+
+Função interna  
+Reduz ruído mental criando ordem externa suficiente.
+
+Frase-resumo  
+Ordem mínima já sustenta o dia.
+
+---
+
+### 07:50 — Leitura leve ou escrita livre
+Emoções  
+curiosidade  
+calma  
+dispersão leve  
+👉 Nomear.
+
+Pensamentos recorrentes  
+“o que está vivo em mim hoje?”  
+“não preciso produzir agora”  
+
+Ajustes internos  
+limitar tempo  
+aceitar rascunho imperfeito  
+parar antes de cansar  
+
+O que NÃO é  
+Não é estudo pesado.  
+Não é cobrança intelectual.
+
+Função interna  
+Abrir o campo mental antes das exigências do dia.
+
+Frase-resumo  
+Aqui a mente aquece, não apanha.
+
+---
+
+### 10:00 — Musculação + corrida em área arborizada
+Emoções  
+esforço  
+descarga  
+vitalidade  
+resistência  
+👉 Nomear.
+
+Pensamentos recorrentes  
+“isso limpa minha cabeça”  
+“meu corpo aguenta”  
+
+Ajustes internos  
+respeitar limites  
+reduzir intensidade se necessário  
+finalizar com desaceleração  
+
+O que NÃO é  
+Não é castigo.  
+Não é competição.
+
+Função interna  
+Regular humor, ansiedade e foco por meio do corpo.
+
+Frase-resumo  
+Eu me organizo pelo movimento.
+
+---
+
+### 13:00 — Almoço tranquilo + descanso mental
+Emoções  
+satisfação  
+pressa  
+irritação leve  
+👉 Nomear.
+
+Pensamentos recorrentes  
+“não posso parar agora”  
+“ainda tem muita coisa”  
+
+Ajustes internos  
+comer sem tela  
+colocar timer de descanso  
+não usar pausa para resolver problemas  
+
+O que NÃO é  
+Não é reunião mental.  
+Não é planejamento disfarçado.
+
+Função interna  
+Evitar o modo automático que drena energia.
+
+Frase-resumo  
+Parar também é avançar.
+
+---
+
+### 15:00 — Criação leve
+Emoções  
+empolgação  
+dúvida  
+frustração leve  
+👉 Nomear.
+
+Pensamentos recorrentes  
+“não é bom o suficiente”  
+“preciso de uma grande ideia”  
+
+Ajustes internos  
+aceitar rascunho feio  
+limitar tempo  
+guardar e parar  
+
+O que NÃO é  
+Não é finalizar produto.  
+Não é provar valor.
+
+Função interna  
+Manter o inventor vivo sem esmagar.
+
+Frase-resumo  
+Rascunho é oxigênio criativo.
+
+---
+
+### 19:00 — Basquete (diversão e socialização)
+Emoções  
+adrenalina  
+alegria  
+vergonha social  
+👉 Nomear.
+
+Pensamentos recorrentes  
+“preciso ir bem”  
+“será que estão me julgando?”  
+
+Ajustes internos  
+priorizar diversão  
+recuperar bem depois  
+não levar cobrança para casa  
+
+O que NÃO é  
+Não é validação.  
+Não é obrigação social.
+
+Função interna  
+Criar vínculo pelo corpo, não pela fala.
+
+Frase-resumo  
+Vínculo também nasce do jogo.
+
+---
+
+### 21:30 — Banho, alimentação leve e desaceleração
+Emoções  
+alívio  
+cansaço  
+mente acelerada  
+👉 Nomear.
+
+Pensamentos recorrentes  
+“ainda falta coisa”  
+“eu devia ter feito mais”  
+
+Ajustes internos  
+reduzir telas  
+luz mais baixa  
+preparar o ambiente  
+
+O que NÃO é  
+Não é reabrir o dia.  
+Não é começar algo novo.
+
+Função interna  
+Preparar o sistema nervoso para o descanso.
+
+Frase-resumo  
+A noite é transição, não reinício.
+
+---
+
+### 23:00 — Preparação para dormir
+Emoções  
+inquietação  
+calma  
+vazio  
+👉 Nomear.
+
+Pensamentos recorrentes  
+“amanhã eu resolvo”  
+“e se eu falhar?”  
+
+Ajustes internos  
+manter horário  
+celular longe  
+respiração lenta  
+
+O que NÃO é  
+Não é revisar a vida.  
+Não é se punir mentalmente.
+
+Função interna  
+Proteger o sono, que protege toda a semana.
+
+Frase-resumo  
+Dormir é estratégia.
+
+## Terça-feira (recuperação)
+
+### 06:00 — Acordar com calma (modo recuperação)
+Emoções  
+O que aparece ao acordar neste dia?
+cansaço  
+leve resistência  
+tranquilidade  
+sensação de corpo pesado  
+neutralidade  
+
+👉 Apenas nomear. Não interpretar.
+
+Pensamentos recorrentes  
+“meu corpo ainda está processando ontem”  
+“não preciso acelerar hoje”  
+“posso ir mais devagar”  
+
+👉 Observe sem responder mentalmente.
+
+Ajustes internos  
+levantar com mais tempo  
+reduzir estímulos sonoros  
+aceitar um ritmo mais lento  
+
+O que NÃO é  
+Não é preguiça.  
+Não é desorganização.  
+Não é desistência.
+
+Função interna  
+Permitir que o sistema nervoso saia do modo esforço e entre em modo recuperação ativa.
+
+Frase-resumo  
+Hoje o corpo vem antes da produtividade.
+
+---
+
+### 07:50 — Leitura inspiradora ou escrita leve
+Emoções  
+curiosidade  
+leve interesse  
+preguiça mental  
+calma  
+
+Pensamentos recorrentes  
+“não quero nada pesado”  
+“quero algo que me acompanhe”  
+“não preciso entender tudo”  
+
+Ajustes internos  
+escolher textos curtos  
+parar antes de cansar  
+aceitar leitura fragmentada  
+
+O que NÃO é  
+Não é estudo técnico.  
+Não é obrigação.  
+Não é cobrança intelectual.
+
+Função interna  
+Manter a mente ativa sem entrar em modo desempenho.
+
+Frase-resumo  
+Hoje a mente passeia, não corre.
+
+---
+
+### 10:00 — Recuperação corporal ativa
+Emoções  
+relaxamento gradual  
+sensação de alongar por dentro  
+alívio  
+leve desconforto físico  
+
+Pensamentos recorrentes  
+“meu corpo pede cuidado”  
+“não preciso provar nada”  
+“isso já é suficiente”  
+
+Ajustes internos  
+reduzir intensidade  
+respeitar limites  
+pausar quando necessário  
+
+O que NÃO é  
+Não é treino.  
+Não é superação.  
+Não é comparação.
+
+Função interna  
+Ajudar o corpo a se reorganizar sem gerar novo estresse.
+
+Frase-resumo  
+Recuperar também é agir.
+
+---
+
+### 14:00 — Pesquisa criativa sem pressão
+Emoções  
+interesse  
+leve dispersão  
+curiosidade aberta  
+
+Pensamentos recorrentes  
+“isso é interessante”  
+“não preciso usar agora”  
+“posso guardar essa ideia”  
+
+Ajustes internos  
+anotar sem organizar  
+não concluir nada  
+evitar decisões  
+
+O que NÃO é  
+Não é criar projeto.  
+Não é resolver problema.  
+Não é planejar execução.
+
+Função interna  
+Alimentar o repertório sem exigir produção imediata.
+
+Frase-resumo  
+Ideias também precisam descansar antes de crescer.
+
+---
+
+### 18:30 — Descanso mental consciente
+Emoções  
+vontade de silêncio  
+alívio  
+cansaço acumulado  
+
+Pensamentos recorrentes  
+“já fiz o suficiente hoje”  
+“posso desligar”  
+“amanhã continuo”  
+
+Ajustes internos  
+diminuir estímulos visuais  
+evitar telas intensas  
+ritualizar o descanso  
+
+O que NÃO é  
+Não é culpa.  
+Não é fuga.  
+Não é improdutividade.
+
+Função interna  
+Encerrar o dia mentalmente antes do sono.
+
+Frase-resumo  
+Descansar também é fechar ciclos.
+
+---
+
+### 22:30 — Preparação antecipada para dormir
+Emoções  
+sonolência  
+desaceleração  
+segurança  
+
+Pensamentos recorrentes  
+“o dia terminou”  
+“não preciso revisar nada”  
+“o corpo sabe dormir”  
+
+Ajustes internos  
+luz baixa  
+ritmo lento  
+constância  
+
+O que NÃO é  
+Não é checar mensagens.  
+Não é repassar o dia.  
+Não é antecipar amanhã.
+
+Função interna  
+Ensinar o corpo a reconhecer o fim do dia com clareza.
+
+Frase-resumo  
+Dormir bem começa antes de deitar.
+
+## Quarta-feira
+
+### 06:00 — Rotina matinal tranquila
+Emoções  
+sensação de meio da semana  
+leve cansaço acumulado  
+neutralidade  
+presença gradual  
+
+👉 Apenas nomear. Não analisar.
+
+Pensamentos recorrentes  
+“já estou no meio do caminho”  
+“não é começo nem fim”  
+“posso ajustar o ritmo”  
+
+Ajustes internos  
+manter o básico  
+evitar pressa  
+não antecipar o resto do dia  
+
+O que NÃO é  
+Não é planejar a semana.  
+Não é avaliar desempenho.  
+Não é cobrança.
+
+Função interna  
+Criar estabilidade antes de entrar em conteúdos mais profundos do dia.
+
+Frase-resumo  
+Antes de ajustar a rota, estabilize o ponto atual.
+
+---
+
+### 07:50 — Escrita reflexiva
+Emoções  
+tensão leve  
+curiosidade interna  
+irritação sutil  
+clareza pontual  
+vazio produtivo  
+tranquilidade  
+
+👉 Não explicar. Só nomear.
+
+Pensamentos recorrentes  
+“estou exigindo demais de mim”  
+“isso não faz sentido agora”  
+“isso me anima”  
+“preciso de mais silêncio”  
+“isso não é prioridade”  
+
+👉 Aqui você observa, não resolve.
+
+Ajustes internos  
+reduzir cobrança em algo específico  
+dormir um pouco mais  
+mover uma tarefa de lugar  
+respeitar mais o descanso  
+parar de insistir no que não flui  
+
+👉 São microajustes, não decisões grandes.
+
+O que NÃO é  
+❌ Não é desabafo longo  
+❌ Não é reviver passado  
+❌ Não é se julgar  
+❌ Não é resolver a vida  
+
+Função interna  
+Correção de rota emocional e mental enquanto ainda há semana pela frente.
+
+Por que isso está na quarta-feira  
+Segunda e terça ainda estão “quentes”.  
+Sexta já é fechamento.  
+Quarta é o ponto ideal de ajuste fino.  
+
+Ela prepara o terreno para  
+a terapia  
+a criação  
+os relacionamentos  
+
+Sem isso, você carrega coisas que não são mais do momento atual.
+
+Frase-resumo  
+Escrita reflexiva é olhar para dentro sem se afundar, só para alinhar.
+
+---
+
+### 10:00 — Treino físico + corrida
+Emoções  
+energia retomando  
+descarga de tensão  
+foco corporal  
+
+Pensamentos recorrentes  
+“meu corpo responde quando eu cuido”  
+“não preciso forçar hoje”  
+“o movimento organiza a mente”  
+
+Ajustes internos  
+respeitar limites  
+regular intensidade  
+usar o treino como regulador, não como meta  
+
+O que NÃO é  
+Não é competição.  
+Não é compensação emocional.  
+Não é punição.
+
+Função interna  
+Regular o sistema nervoso após a escrita reflexiva.
+
+Frase-resumo  
+O corpo ajuda a mente a digerir o que foi visto.
+
+---
+
+### 14:00 — Sessão de terapia
+Emoções  
+vulnerabilidade  
+resistência leve  
+expectativa  
+alívio possível  
+
+Pensamentos recorrentes  
+“não sei por onde começar”  
+“isso é importante”  
+“posso falar no meu ritmo”  
+
+Ajustes internos  
+não preparar discurso  
+aceitar pausas  
+confiar no processo  
+
+O que NÃO é  
+Não é performance.  
+Não é agradar o terapeuta.  
+Não é ter respostas prontas.
+
+Função interna  
+Aprofundar o que foi observado pela manhã com suporte externo.
+
+Frase-resumo  
+Na terapia, o ritmo é mais importante que a conclusão.
+
+---
+
+### 15:00 — Digestão da terapia
+Emoções  
+cansaço  
+sensibilidade  
+silêncio interno  
+
+Pensamentos recorrentes  
+“isso mexeu comigo”  
+“não preciso entender agora”  
+“posso só sentir”  
+
+Ajustes internos  
+reduzir estímulos  
+evitar conversas profundas  
+permitir descanso mental  
+
+O que NÃO é  
+Não é analisar a sessão.  
+Não é tirar conclusões.  
+Não é agir imediatamente.
+
+Função interna  
+Permitir que o conteúdo da terapia se assente sem ruído.
+
+Frase-resumo  
+Depois de mexer fundo, é preciso deixar assentar.
+
+---
+
+### 19:00 — Atividade leve ou encontro simples
+Emoções  
+presença  
+leveza  
+cautela social  
+
+Pensamentos recorrentes  
+“não preciso render”  
+“posso ser simples”  
+“menos expectativa ajuda”  
+
+Ajustes internos  
+escolher ambientes tranquilos  
+limitar duração  
+priorizar conforto  
+
+O que NÃO é  
+Não é provar conexão.  
+Não é criar intimidade forçada.  
+Não é resolver relações.
+
+Função interna  
+Reintroduzir o contato com o mundo sem sobrecarga.
+
+Frase-resumo  
+Conexão também pode ser leve.
+
+---
+
+### 23:00 — Preparação para dormir
+Emoções  
+exaustão boa  
+alívio  
+desligamento gradual  
+
+Pensamentos recorrentes  
+“hoje foi suficiente”  
+“não preciso fechar tudo”  
+“amanhã continuo”  
+
+Ajustes internos  
+rotina previsível  
+luz baixa  
+menos estímulo  
+
+O que NÃO é  
+Não é revisar o dia.  
+Não é planejar amanhã.  
+Não é buscar distração.
+
+Função interna  
+Fechar um dia intenso com segurança.
+
+Frase-resumo  
+Depois de ajustar a rota, o descanso consolida.
+
+## Quinta-feira
+
+### 06:00 — Acordar, café e ativação leve do corpo
+Emoções  
+sonolência residual  
+estabilidade  
+leve motivação  
+corpo despertando  
+
+👉 Apenas nomear. Não interpretar.
+
+Pensamentos recorrentes  
+“hoje consigo focar melhor”  
+“não preciso correr”  
+“o corpo acorda antes da mente”  
+
+Ajustes internos  
+ativar o corpo sem acelerar  
+manter ritual simples  
+evitar excesso de informação  
+
+O que NÃO é  
+Não é checar pendências.  
+Não é planejar criação.  
+Não é antecipar resultados.
+
+Função interna  
+Preparar o terreno físico e mental para um dia de foco mais profundo.
+
+Frase-resumo  
+O foco nasce da estabilidade, não da pressa.
+
+---
+
+### 07:50 — Aprendizado técnico
+Emoções  
+curiosidade  
+leve frustração possível  
+engajamento mental  
+
+Pensamentos recorrentes  
+“isso é complexo, mas interessante”  
+“não preciso entender tudo agora”  
+“posso aprender em camadas”  
+
+Ajustes internos  
+limitar tempo de estudo  
+priorizar compreensão, não volume  
+aceitar dúvidas abertas  
+
+O que NÃO é  
+Não é produtividade forçada.  
+Não é comparação.  
+Não é cobrança por domínio imediato.
+
+Função interna  
+Alimentar a criação profunda com base sólida, sem exaustão.
+
+Frase-resumo  
+Aprender é preparar o terreno, não construir tudo hoje.
+
+---
+
+### 10:00 — Treino físico + corrida
+Emoções  
+energia crescente  
+descarga de tensão  
+presença corporal  
+
+Pensamentos recorrentes  
+“o corpo sustenta o foco”  
+“não preciso exagerar”  
+“movimento limpa a mente”  
+
+Ajustes internos  
+regular intensidade  
+usar respiração como guia  
+respeitar sinais físicos  
+
+O que NÃO é  
+Não é bater meta.  
+Não é competir.  
+Não é compensar ansiedade.
+
+Função interna  
+Manter equilíbrio entre esforço mental e físico.
+
+Frase-resumo  
+O corpo impede que o foco vire rigidez.
+
+---
+
+### 14:00 — Criação profunda
+Emoções  
+imersão  
+resistência inicial  
+clareza progressiva  
+fluxo possível  
+
+Pensamentos recorrentes  
+“é aqui que preciso ficar”  
+“uma coisa de cada vez”  
+“menos distração ajuda”  
+
+Ajustes internos  
+definir um único foco  
+limitar interrupções  
+aceitar imperfeição  
+
+O que NÃO é  
+Não é multitarefa.  
+Não é finalizar tudo.  
+Não é buscar validação.
+
+Função interna  
+Transformar aprendizado em algo vivo, mesmo que inacabado.
+
+Frase-resumo  
+Criação profunda pede presença, não pressa.
+
+---
+
+### 20:00 — Lazer ou relacionamento leve
+Emoções  
+descompressão  
+afeto simples  
+cansaço saudável  
+
+Pensamentos recorrentes  
+“não preciso performar”  
+“posso só estar”  
+“leveza também é cuidado”  
+
+Ajustes internos  
+escolher companhia segura  
+limitar expectativas  
+priorizar conforto  
+
+O que NÃO é  
+Não é resolver vínculos.  
+Não é conversa pesada.  
+Não é sobre futuro.
+
+Função interna  
+Encerrar o dia criativo sem ruptura brusca.
+
+Frase-resumo  
+Depois do foco, a leveza restaura.
+
+---
+
+### 23:00 — Sono
+Emoções  
+desligamento  
+satisfação silenciosa  
+exaustão boa  
+
+Pensamentos recorrentes  
+“hoje foi suficiente”  
+“o processo continua amanhã”  
+
+Ajustes internos  
+ritual previsível  
+reduzir estímulos  
+respeitar o cansaço  
+
+O que NÃO é  
+Não é revisar criação.  
+Não é planejar sexta.  
+Não é consumir conteúdo.
+
+Função interna  
+Consolidar o que foi criado e aprendido.
+
+Frase-resumo  
+O descanso é parte do trabalho profundo.
+
+## Sexta-feira
+
+### 06:00 — Início consciente do dia
+Emoções  
+leve cansaço acumulado  
+alívio por chegar ao fim da semana  
+estabilidade  
+expectativa moderada  
+
+👉 Apenas nomear. Não avaliar.
+
+Pensamentos recorrentes  
+“cheguei até aqui”  
+“não preciso provar nada hoje”  
+“o ritmo pode ser mais humano”  
+
+Ajustes internos  
+reduzir pressa matinal  
+manter rituais simples  
+não antecipar o fim de semana  
+
+O que NÃO é  
+Não é acelerar tarefas.  
+Não é compensar atrasos.  
+Não é planejar tudo de uma vez.
+
+Função interna  
+Começar o fechamento da semana sem colapsar energia.
+
+Frase-resumo  
+Encerrar bem começa logo cedo.
+
+---
+
+### 07:50 — Organizar a semana (revisão)
+Emoções  
+clareza gradual  
+leve confusão inicial  
+satisfação ao reconhecer avanços  
+
+Pensamentos recorrentes  
+“isso funcionou”  
+“isso não funcionou e tudo bem”  
+“aprendi algo aqui”  
+
+Ajustes internos  
+anotar sem julgar  
+separar fatos de opiniões  
+não reescrever a semana  
+
+O que NÃO é  
+Não é autocrítica.  
+Não é planejamento futuro detalhado.  
+Não é cobrança por perfeição.
+
+Função interna  
+Transformar a semana vivida em aprendizado consciente.
+
+Frase-resumo  
+Revisar é colher, não se cobrar.
+
+---
+
+### 10:00 — Treino físico + corrida
+Emoções  
+descarga  
+resiliência  
+presença corporal  
+alívio mental  
+
+Pensamentos recorrentes  
+“o corpo aguenta”  
+“não preciso ir além”  
+“fechar a semana no corpo ajuda”  
+
+Ajustes internos  
+regular intensidade  
+priorizar constância  
+evitar competição interna  
+
+O que NÃO é  
+Não é superar limites.  
+Não é punição.  
+Não é buscar performance máxima.
+
+Função interna  
+Encerrar o ciclo semanal físico, liberando tensão acumulada.
+
+Frase-resumo  
+O corpo fecha ciclos que a mente não fecha sozinha.
+
+---
+
+### 16:00 — Encerramento produtivo
+Emoções  
+alívio  
+leve resistência  
+organização mental  
+
+Pensamentos recorrentes  
+“fiz o que foi possível”  
+“algumas coisas ficam para depois”  
+“não preciso carregar isso no fim de semana”  
+
+Ajustes internos  
+listar poucos pontos  
+aceitar pendências  
+separar controle de excesso  
+
+O que NÃO é  
+Não é lista infinita.  
+Não é reabrir problemas.  
+Não é justificar falhas.
+
+Função interna  
+Fechar a semana na mente para liberar presença no descanso.
+
+Frase-resumo  
+Encerrar não é concluir tudo — é parar de carregar.
+
+---
+
+### 19:00 — Convívio social ou lazer
+Emoções  
+leveza  
+conexão  
+necessidade de descanso  
+prazer simples  
+
+Pensamentos recorrentes  
+“posso relaxar agora”  
+“não preciso render”  
+“estar junto já basta”  
+
+Ajustes internos  
+escolher ambientes seguros  
+limitar estímulos excessivos  
+priorizar conforto  
+
+O que NÃO é  
+Não é socialização obrigatória.  
+Não é resolver relações.  
+Não é excesso.
+
+Função interna  
+Marcar a transição clara entre semana ativa e descanso.
+
+Frase-resumo  
+O descanso começa quando a cobrança termina.
+
+---
+
+### 23:30 — Dormir
+Emoções  
+desligamento  
+satisfação silenciosa  
+cansaço saudável  
+
+Pensamentos recorrentes  
+“a semana acabou”  
+“posso soltar agora”  
+
+Ajustes internos  
+ritual previsível  
+reduzir telas  
+respeitar o sono  
+
+O que NÃO é  
+Não é revisar tarefas.  
+Não é planejar sábado.  
+Não é consumir informação.
+
+Função interna  
+Permitir recuperação real para o fim de semana.
+
+Frase-resumo  
+Dormir bem é fechar a semana com dignidade.
+
+## Sábado
+
+### 07:00 — Acordar sem pressa
+Emoções  
+tranquilidade  
+preguiça leve  
+alívio  
+descompressão  
+
+👉 Apenas nomear. Não corrigir.
+
+Pensamentos recorrentes  
+“não tenho horário rígido hoje”  
+“posso começar devagar”  
+“não preciso produzir agora”  
+
+Ajustes internos  
+permitir mais tempo na cama  
+não usar despertador agressivo  
+manter silêncio inicial  
+
+O que NÃO é  
+Não é perder o dia.  
+Não é dormir por fuga.  
+Não é ignorar o corpo.
+
+Função interna  
+Quebrar o padrão automático de produtividade e entrar em modo humano.
+
+Frase-resumo  
+Descansar também é uma ação consciente.
+
+---
+
+### 10:00 — Treino físico + corrida (sem cobrança)
+Emoções  
+liberação  
+prazer corporal  
+energia limpa  
+leve desafio  
+
+Pensamentos recorrentes  
+“movimento me faz bem”  
+“não preciso provar nada”  
+“o corpo guia hoje”  
+
+Ajustes internos  
+reduzir intensidade se necessário  
+seguir sensação corporal  
+parar antes do esgotamento  
+
+O que NÃO é  
+Não é treino de desempenho.  
+Não é compensar excessos.  
+Não é comparação.
+
+Função interna  
+Manter o corpo vivo sem ativar o modo cobrança.
+
+Frase-resumo  
+Movimento no sábado é cuidado, não obrigação.
+
+---
+
+### 15:00 — Tempo livre criativo ou social
+Emoções  
+curiosidade  
+leve dispersão  
+entusiasmo espontâneo  
+conexão  
+
+Pensamentos recorrentes  
+“o que me dá vontade agora?”  
+“isso me diverte”  
+“não preciso terminar nada”  
+
+Ajustes internos  
+escolher pelo prazer  
+evitar multitarefa  
+seguir interesse real  
+
+O que NÃO é  
+Não é produtividade disfarçada.  
+Não é planejamento futuro.  
+Não é cobrança de resultado.
+
+Função interna  
+Reconectar com desejo genuíno e criatividade não utilitária.
+
+Frase-resumo  
+Criar por prazer reorganiza a mente.
+
+---
+
+### 19:00 — Relacionamento, diversão ou descanso profundo
+Emoções  
+acolhimento  
+presença  
+relaxamento  
+vínculo  
+
+Pensamentos recorrentes  
+“posso estar aqui inteiro”  
+“não preciso resolver nada”  
+“estar junto já basta”  
+
+Ajustes internos  
+escolher ambientes seguros  
+respeitar limites sociais  
+priorizar conforto emocional  
+
+O que NÃO é  
+Não é performance social.  
+Não é conversa difícil.  
+Não é exposição excessiva.
+
+Função interna  
+Fortalecer vínculos sem desgaste emocional.
+
+Frase-resumo  
+Presença vale mais que intensidade.
+
+---
+
+### 00:00 — Sono
+Emoções  
+desligamento  
+satisfação  
+calma  
+
+Pensamentos recorrentes  
+“o dia foi suficiente”  
+“posso descansar”  
+
+Ajustes internos  
+ritual simples  
+luz baixa  
+desaceleração gradual  
+
+O que NÃO é  
+Não é consumo de estímulo até cair.  
+Não é revisar semana.  
+Não é antecipar domingo.
+
+Função interna  
+Permitir recuperação plena sem pressão.
+
+Frase-resumo  
+Dormir bem sustenta o domingo.
+
+## Domingo
+
+### 08:00 — Acordar tranquilo
+Emoções  
+calma  
+neutralidade  
+leve melancolia  
+presença  
+
+👉 Apenas nomear. Não interpretar.
+
+Pensamentos recorrentes  
+“o dia é mais lento”  
+“não preciso correr”  
+“posso ouvir o corpo”  
+
+Ajustes internos  
+acordar sem alarme rígido  
+evitar notícias  
+manter silêncio inicial  
+
+O que NÃO é  
+Não é dormir por exaustão.  
+Não é evitar o dia.  
+Não é antecipar problemas da semana.
+
+Função interna  
+Marcar a transição consciente entre descanso e integração.
+
+Frase-resumo  
+O domingo começa sem urgência.
+
+---
+
+### 10:00 — Caminhada leve, alongamento ou contato com a natureza
+Emoções  
+leveza  
+equilíbrio  
+aterramento  
+clareza  
+
+Pensamentos recorrentes  
+“meu corpo sabe o ritmo”  
+“não preciso ir longe”  
+“isso me organiza por dentro”  
+
+Ajustes internos  
+movimento lento  
+atenção à respiração  
+olhar o ambiente  
+
+O que NÃO é  
+Não é exercício formal.  
+Não é meta de desempenho.  
+Não é distração automática.
+
+Função interna  
+Ajudar o sistema nervoso a integrar a semana que passou.
+
+Frase-resumo  
+Movimento suave organiza o pensamento.
+
+---
+
+### 15:00 — Convívio afetivo ou lazer simples
+Emoções  
+conexão  
+acolhimento  
+conforto  
+presença  
+
+Pensamentos recorrentes  
+“estar junto já é suficiente”  
+“não preciso conversar o tempo todo”  
+“posso só compartilhar espaço”  
+
+Ajustes internos  
+escolher companhia segura  
+limitar exposição  
+respeitar cansaço social  
+
+O que NÃO é  
+Não é resolver conflitos.  
+Não é cobrança emocional.  
+Não é exposição excessiva.
+
+Função interna  
+Nutrir vínculo sem desgaste psíquico.
+
+Frase-resumo  
+Afeto saudável não exige performance.
+
+---
+
+### 18:00 — Planejamento leve da semana seguinte
+Emoções  
+clareza  
+organização  
+leve ansiedade  
+controle saudável  
+
+Pensamentos recorrentes  
+“o que é essencial?”  
+“o que pode esperar?”  
+“o que não cabe essa semana?”  
+
+Ajustes internos  
+listar sem rigidez  
+não lotar a agenda  
+deixar espaços vazios  
+
+O que NÃO é  
+Não é planejamento detalhado.  
+Não é cobrança futura.  
+Não é resolver tudo agora.
+
+Função interna  
+Criar previsibilidade sem ativar pressão.
+
+Frase-resumo  
+Planejar leve é proteger a semana.
+
+---
+
+### 22:30 — Preparação para dormir
+Emoções  
+encerramento  
+tranquilidade  
+segurança  
+
+Pensamentos recorrentes  
+“a semana pode começar organizada”  
+“já fiz o suficiente hoje”  
+
+Ajustes internos  
+luz baixa  
+ritual repetível  
+desligar estímulos  
+
+O que NÃO é  
+Não é revisar erros.  
+Não é antecipar problemas.  
+Não é consumo excessivo de telas.
+
+Função interna  
+Encerrar o ciclo semanal com estabilidade.
+
+Frase-resumo  
+O descanso de domingo sustenta a semana inteira.
+`;
+
+/**
+ * Parser e UI (igual ao seu, só trocou o carregamento)
+ */
+
+let rotina = [];
+let diaAtual = 0;
+let idAberto = null;
+let travarSwipe = false;
+
+const tasksDiv = document.getElementById("tasks");
+const dayDiv = document.getElementById("day");
+const hintDiv = document.getElementById("hint");
+
+function escapeHtml(s) {
+  return (s || "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;");
+}
+
+function toDetailsHtml(text) {
+  const safe = escapeHtml(text.trim());
+  return safe
+    .replace(/\r/g, "")
+    .replace(/\n{3,}/g, "\n\n")
+    .replace(/\n/g, "<br>");
+}
+
+function parseTaskHeader(line) {
+  const raw = line.replace(/^###\s*/, "").trim();
+  const m = raw.match(/^(\d{2}:\d{2})\s*[—-]\s*(.+)$/);
+  if (!m) return { hora: "", curta: raw };
+  return { hora: m[1], curta: m[2].trim() };
+}
+
+function parseSemanaMd(md) {
+  const lines = md.replace(/\r/g, "").split("\n");
+
+  const dias = [];
+  let diaAtualObj = null;
+  let tarefaAtual = null;
+
+  function finalizarTarefa() {
+    if (tarefaAtual && diaAtualObj) {
+      tarefaAtual.longa = tarefaAtual._buffer.join("\n").trim();
+      delete tarefaAtual._buffer;
+      diaAtualObj.tarefas.push(tarefaAtual);
+    }
+    tarefaAtual = null;
+  }
+
+  function finalizarDia() {
+    finalizarTarefa();
+    if (diaAtualObj) dias.push(diaAtualObj);
+    diaAtualObj = null;
+  }
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+
+    if (line.startsWith("## ")) {
+      finalizarDia();
+      diaAtualObj = { dia: line.replace(/^##\s*/, "").trim(), tarefas: [] };
+      continue;
+    }
+
+    if (line.startsWith("### ")) {
+      finalizarTarefa();
+      if (!diaAtualObj) diaAtualObj = { dia: "Dia", tarefas: [] };
+      const { hora, curta } = parseTaskHeader(line);
+      tarefaAtual = { hora, curta, longa: "", _buffer: [] };
+      continue;
+    }
+
+    if (tarefaAtual) {
+      tarefaAtual._buffer.push(line);
+    }
+  }
+
+  finalizarDia();
+  return dias;
+}
+
+function getDiaIndexHoje() {
+  const hoje = new Date().getDay();
+  const nomes = [
+    "Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira",
+    "Quinta-feira", "Sexta-feira", "Sábado"
+  ];
+
+  const nomeHoje = nomes[hoje];
+  const idx = rotina.findIndex(d => d.dia.toLowerCase().startsWith(nomeHoje.toLowerCase()));
+  return idx >= 0 ? idx : 0;
+}
+
+function minutos(h) {
+  const p = (h || "00:00").split(":");
+  return parseInt(p[0] || "0") * 60 + parseInt(p[1] || "0");
+}
+
+function getTarefaAtivaIndex() {
+  if (!rotina[diaAtual] || !rotina[diaAtual].tarefas.length) return -1;
+
+  const agora = new Date();
+  const minAgora = agora.getHours() * 60 + agora.getMinutes();
+
+  let ativa = 0;
+  rotina[diaAtual].tarefas.forEach((t, i) => {
+    if (minutos(t.hora) <= minAgora) ativa = i;
+  });
+  return ativa;
+}
+
+function render(autoOpenNow = true) {
+  tasksDiv.innerHTML = "";
+
+  if (!rotina.length) {
+    dayDiv.textContent = "Sem dados";
+    tasksDiv.innerHTML = `<div class="error">
+      Texto da rotina vazio ou inválido.<br><br>
+      ✅ Confirme que existe pelo menos um <b>## Dia</b> e tarefas com <b>### 07:50 — Título</b>.
+    </div>`;
+    return;
+  }
+
+  dayDiv.textContent = rotina[diaAtual].dia;
+
+  const ativaIdx = getTarefaAtivaIndex();
+
+  rotina[diaAtual].tarefas.forEach((t, i) => {
+    const div = document.createElement("div");
+    const id = `${diaAtual}-${i}`;
+    div.className = "task" + (i === ativaIdx ? " active" : "") + (idAberto === id ? " open" : "");
+
+    const detailsHtml = toDetailsHtml(t.longa || "");
+    div.innerHTML = `
+      <div class="task-header" data-id="${id}">
+        <div class="time">${t.hora || ""}</div>
+        <div class="short">${t.curta || ""}</div>
+      </div>
+      <div class="details">${detailsHtml || "<i>Sem detalhes neste horário.</i>"}</div>
+    `;
+
+    const header = div.querySelector(".task-header");
+    const details = div.querySelector(".details");
+
+    details.addEventListener("touchstart", () => { travarSwipe = true; }, { passive: true });
+    details.addEventListener("touchend", () => { setTimeout(() => travarSwipe = false, 120); }, { passive: true });
+    details.addEventListener("wheel", () => { travarSwipe = true; setTimeout(() => travarSwipe = false, 200); });
+
+    header.onclick = () => {
+      idAberto = (idAberto === id) ? null : id;
+      render(false);
+    };
+
+    tasksDiv.appendChild(div);
+  });
+
+  if (autoOpenNow && ativaIdx >= 0) {
+    idAberto = `${diaAtual}-${ativaIdx}`;
+    setTimeout(() => render(false), 0);
+  }
+}
+
+function proximoDia() {
+  if (!rotina.length) return;
+  diaAtual = (diaAtual + 1) % rotina.length;
+  idAberto = null;
+  render(true);
+}
+
+function diaAnterior() {
+  if (!rotina.length) return;
+  diaAtual = (diaAtual + rotina.length - 1) % rotina.length;
+  idAberto = null;
+  render(true);
+}
+
+let startX = 0;
+document.body.addEventListener("touchstart", e => {
+  startX = e.changedTouches[0].screenX;
+}, { passive: true });
+
+document.body.addEventListener("touchend", e => {
+  if (travarSwipe) return;
+  const diff = e.changedTouches[0].screenX - startX;
+  if (diff > 50) diaAnterior();
+  if (diff < -50) proximoDia();
+}, { passive: true });
+
+document.addEventListener("keydown", (e) => {
+  if (e.key === "ArrowLeft") diaAnterior();
+  if (e.key === "ArrowRight") proximoDia();
+});
+
+function iniciar() {
+  rotina = parseSemanaMd(SEMANA_MD);
+  hintDiv.textContent = "Toque em um horário para abrir os detalhes. Setas do teclado funcionam no PC.";
+  diaAtual = getDiaIndexHoje();
+  render(true);
+}
+
+iniciar();
+</script>
+
+</body>
+</html>
