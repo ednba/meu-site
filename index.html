@@ -3,127 +3,139 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Rotina Viva</title>
+<title>Rotina Viva (Arquivo Único)</title>
 
 <style>
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: #0f172a;
-  color: #e5e7eb;
-}
+  body{
+    margin:0;
+    font-family:Arial, sans-serif;
+    background:#0f172a;
+    color:#e5e7eb;
+  }
+  header{
+    background:#020617;
+    padding:15px;
+    text-align:center;
+  }
+  header h1{
+    margin:0;
+    font-size:20px;
+  }
+  header p{
+    margin:6px 0 0;
+    color:#38bdf8;
+    font-size:14px;
+  }
 
-header {
-  background: #020617;
-  padding: 15px;
-  text-align: center;
-}
+  .container{
+    padding:15px;
+    overflow-y:auto;
+    height:calc(100vh - 150px);
+  }
 
-header h1 {
-  margin: 0;
-  font-size: 20px;
-}
+  .task{
+    background:#020617;
+    border-radius:12px;
+    padding:14px;
+    margin-bottom:12px;
+    border:2px solid transparent;
+  }
+  .task.active{
+    border-color:#22c55e;
+  }
 
-header p {
-  margin: 5px 0 0;
-  color: #38bdf8;
-}
+  .task-header{
+    cursor:pointer;
+    user-select:none;
+  }
+  .time{
+    color:#facc15;
+    font-weight:bold;
+    font-size:16px;
+  }
+  .short{
+    margin-top:6px;
+    font-size:15px;
+    line-height:1.4;
+  }
 
-.container {
-  padding: 15px;
-  overflow-y: auto;
-  height: calc(100vh - 120px);
-}
+  .details{
+    margin-top:10px;
+    border-top:1px solid #1e293b;
+    padding-top:10px;
+    font-size:14px;
+    line-height:1.6;
+    max-height:260px;
+    overflow-y:auto;
+    display:none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .task.open .details{
+    display:block;
+  }
 
-.task {
-  background: #020617;
-  border-radius: 12px;
-  padding: 14px;
-  margin-bottom: 12px;
-}
+  footer{
+    background:#020617;
+    text-align:center;
+    padding:10px;
+    font-size:14px;
+    color:#94a3b8;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:10px;
+  }
+  footer span{
+    flex:1;
+    text-align:center;
+  }
 
-.task.active {
-  border: 2px solid #22c55e;
-}
+  button{
+    background:none;
+    border:none;
+    color:#38bdf8;
+    font-size:20px;
+    cursor:pointer;
+    padding:6px 10px;
+    border-radius:10px;
+  }
+  button:active{
+    background:#0b1224;
+  }
 
-.task-header {
-  cursor: pointer;
-}
-
-.time {
-  color: #facc15;
-  font-weight: bold;
-  font-size: 16px;
-}
-
-.short {
-  margin-top: 6px;
-  font-size: 15px;
-}
-
-.details {
-  margin-top: 10px;
-  border-top: 1px solid #1e293b;
-  padding-top: 10px;
-  font-size: 14px;
-  line-height: 1.6;
-  max-height: 260px;
-  overflow-y: auto;
-  display: none;
-
-  /* importante: permite rolar dentro sem fechar */
-  touch-action: pan-y;
-  -webkit-overflow-scrolling: touch;
-}
-
-.task.open .details {
-  display: block;
-}
-
-footer {
-  background: #020617;
-  text-align: center;
-  padding: 10px;
-  font-size: 14px;
-  color: #94a3b8;
-}
-.smallhint {
-  font-size: 12px;
-  color: #64748b;
-  margin-top: 6px;
-}
-.error {
-  background: #7f1d1d;
-  color: #fee2e2;
-  padding: 10px;
-  border-radius: 10px;
-  margin: 15px;
-  font-size: 14px;
-  line-height: 1.4;
-}
+  .hint{
+    font-size:12px;
+    color:#64748b;
+    margin-top:6px;
+  }
 </style>
 </head>
 
 <body>
-
 <header>
   <h1>Rotina Viva</h1>
-  <p id="day">Carregando…</p>
-  <div class="smallhint" id="hint"></div>
+  <p id="day"></p>
+  <div class="hint" id="hint"></div>
 </header>
 
 <div class="container" id="tasks"></div>
 
 <footer>
-  ← Deslize para direita ou esquerda para mudar o dia →
+  <button id="prevBtn" aria-label="Dia anterior">←</button>
+  <span>Deslize ou use as setas</span>
+  <button id="nextBtn" aria-label="Próximo dia">→</button>
 </footer>
 
 <script>
 /**
- * AGORA É TUDO EM UM ARQUIVO (sem semana.md)
- * O conteúdo abaixo substitui o semana.md
+ * ✅ ARQUIVO ÚNICO
+ * Edite o texto abaixo (semanaMD) para mudar sua rotina.
+ * Regras:
+ * - Cada dia começa com: ## Nome do dia
+ * - Cada tarefa começa com: ### 07:50 — Título
+ * - O resto vira a explicação longa (pode ter linhas e parágrafos).
  */
-const SEMANA_MD = `
+const semanaMD = `
 ## Segunda-feira
 
 ### 06:00 — Acordar com calma
@@ -175,51 +187,63 @@ Pensamentos recorrentes
 👉 Observar.
 
 Ajustes internos  
-organizar só o essencial  
-limitar tempo  
+organizar só o essencial (cama, pia, lixo, roupa)  
+limitar tempo (ex: 20 min)  
 não buscar controle total  
+👉 O objetivo é “suficiente”, não “ideal”.
 
 O que NÃO é  
-Não é faxina completa.  
-Não é procrastinação disfarçada.
+Não é faxina pesada.  
+Não é arrumação infinita.  
+Não é perfeccionismo.
 
 Função interna  
-Reduz ruído mental criando ordem externa suficiente.
+Criar ordem externa mínima para reduzir ruído mental e facilitar foco.
 
 Frase-resumo  
-Ordem mínima já sustenta o dia.
+Ordem mínima sustenta o dia.
 
 ---
 
-### 07:50 — Leitura leve ou escrita livre
+### 07:50 — Leitura leve ou escrita livre (aquecimento mental)
 Emoções  
 curiosidade  
 calma  
 dispersão leve  
+pressa mental  
 👉 Nomear.
 
 Pensamentos recorrentes  
-“o que está vivo em mim hoje?”  
-“não preciso produzir agora”  
+“preciso produzir logo”  
+“se eu começar, vou ter que terminar”  
+👉 Observar e soltar.
 
 Ajustes internos  
-limitar tempo  
-aceitar rascunho imperfeito  
+escolher algo curto (10–20 páginas ou 15 min)  
 parar antes de cansar  
+aceitar rascunho imperfeito  
+👉 É aquecimento, não performance.
+
+Se escolher ESCRITA (prompts rápidos)  
+A) 3 emoções presentes agora (sem explicar)  
+B) 3 pensamentos repetidos hoje cedo  
+C) 1 microajuste para o dia (bem pequeno)  
+D) 1 frase de intenção: “Hoje eu vou _______ sem _______.”
 
 O que NÃO é  
-Não é estudo pesado.  
-Não é cobrança intelectual.
+Não é estudo técnico pesado.  
+Não é cobrança intelectual.  
+Não é “virar obrigação”.
 
 Função interna  
-Abrir o campo mental antes das exigências do dia.
+Abrir o campo mental com leveza antes das exigências do dia.
 
 Frase-resumo  
-Aqui a mente aquece, não apanha.
+A mente aquece, não apanha.
 
 ---
 
-### 10:00 — Musculação + corrida em área arborizada
+### 10:00 — Musculação + corrida (30 min, área arborizada)
 Emoções  
 esforço  
 descarga  
@@ -230,15 +254,19 @@ resistência
 Pensamentos recorrentes  
 “isso limpa minha cabeça”  
 “meu corpo aguenta”  
+“se eu falhar hoje, estrago tudo”  
+👉 Observar e retornar ao corpo.
 
 Ajustes internos  
-respeitar limites  
-reduzir intensidade se necessário  
-finalizar com desaceleração  
+regular intensidade (não precisa ser máximo)  
+usar respiração como guia  
+finalizar com desaceleração (3–5 min lento)  
+👉 O treino termina “com paz”, não “na marra”.
 
 O que NÃO é  
 Não é castigo.  
-Não é competição.
+Não é competição.  
+Não é compensar culpa.
 
 Função interna  
 Regular humor, ansiedade e foco por meio do corpo.
@@ -253,51 +281,66 @@ Emoções
 satisfação  
 pressa  
 irritação leve  
+vontade de “resolver algo”  
 👉 Nomear.
 
 Pensamentos recorrentes  
 “não posso parar agora”  
-“ainda tem muita coisa”  
+“se eu pausar, vou perder tempo”  
+👉 Observar.
 
 Ajustes internos  
-comer sem tela  
-colocar timer de descanso  
-não usar pausa para resolver problemas  
+comer sem tela (ou com som/ambiente leve)  
+pausa real 10–20 min  
+não usar a pausa para problemas  
+👉 Pausa é pausa.
 
 O que NÃO é  
 Não é reunião mental.  
-Não é planejamento disfarçado.
+Não é planejamento disfarçado.  
+Não é “rolar celular até cansar”.
 
 Função interna  
-Evitar o modo automático que drena energia.
+Evitar modo automático e recuperar energia para o resto do dia.
 
 Frase-resumo  
 Parar também é avançar.
 
 ---
 
-### 15:00 — Criação leve
+### 15:00 — Criação leve (rascunho sem cobrança)
 Emoções  
 empolgação  
 dúvida  
 frustração leve  
+curiosidade  
 👉 Nomear.
 
 Pensamentos recorrentes  
 “não é bom o suficiente”  
 “preciso de uma grande ideia”  
+“se não for genial, não serve”  
+👉 Observar.
 
 Ajustes internos  
+definir um limite (ex: 45–60 min)  
 aceitar rascunho feio  
-limitar tempo  
-guardar e parar  
+terminar com “próximo passo simples”  
+👉 A criação termina com “gancho”, não com exaustão.
+
+Mini-roteiro (pra não travar)  
+A) Qual problema/tema eu quero explorar? (1 frase)  
+B) 10 ideias ruins rápidas (sem filtro)  
+C) Escolher 1 e rascunhar por 10 min  
+D) Salvar e parar
 
 O que NÃO é  
 Não é finalizar produto.  
-Não é provar valor.
+Não é provar valor.  
+Não é buscar validação.
 
 Função interna  
-Manter o inventor vivo sem esmagar.
+Manter a mente inventiva viva sem esmagar.
 
 Frase-resumo  
 Rascunho é oxigênio criativo.
@@ -309,23 +352,28 @@ Emoções
 adrenalina  
 alegria  
 vergonha social  
+competitividade  
 👉 Nomear.
 
 Pensamentos recorrentes  
 “preciso ir bem”  
 “será que estão me julgando?”  
+“se eu errar, acabou”  
+👉 Observar.
 
 Ajustes internos  
+focar em 1 objetivo simples (ex: marcar bem / mover sem bola)  
 priorizar diversão  
-recuperar bem depois  
-não levar cobrança para casa  
+recuperar bem depois (água, alongamento leve)  
+👉 O jogo não decide seu valor.
 
 O que NÃO é  
 Não é validação.  
-Não é obrigação social.
+Não é obrigação social.  
+Não é “provar que você é bom”.
 
 Função interna  
-Criar vínculo pelo corpo, não pela fala.
+Criar vínculo pelo corpo e presença, não por discurso.
 
 Frase-resumo  
 Vínculo também nasce do jogo.
@@ -342,15 +390,18 @@ mente acelerada
 Pensamentos recorrentes  
 “ainda falta coisa”  
 “eu devia ter feito mais”  
+👉 Observar e soltar.
 
 Ajustes internos  
-reduzir telas  
 luz mais baixa  
-preparar o ambiente  
+reduzir telas  
+banho como ritual de “fechar o dia”  
+👉 A noite começa quando você desliga o motor.
 
 O que NÃO é  
 Não é reabrir o dia.  
-Não é começar algo novo.
+Não é começar algo novo.  
+Não é “ficar acelerado até apagar”.
 
 Função interna  
 Preparar o sistema nervoso para o descanso.
@@ -370,18 +421,21 @@ vazio
 Pensamentos recorrentes  
 “amanhã eu resolvo”  
 “e se eu falhar?”  
+👉 Observar.
 
 Ajustes internos  
-manter horário  
 celular longe  
-respiração lenta  
+respiração lenta (3–5 min)  
+horário consistente  
+👉 O sono é protegido, não “esperado”.
 
 O que NÃO é  
 Não é revisar a vida.  
-Não é se punir mentalmente.
+Não é se punir mentalmente.  
+Não é buscar estímulo.
 
 Função interna  
-Proteger o sono, que protege toda a semana.
+Proteger o sono, que protege a semana.
 
 Frase-resumo  
 Dormir é estratégia.
@@ -390,34 +444,30 @@ Dormir é estratégia.
 
 ### 06:00 — Acordar com calma (modo recuperação)
 Emoções  
-O que aparece ao acordar neste dia?
 cansaço  
-leve resistência  
+corpo pesado  
 tranquilidade  
-sensação de corpo pesado  
-neutralidade  
-
-👉 Apenas nomear. Não interpretar.
+resistência leve  
+👉 Nomear.
 
 Pensamentos recorrentes  
 “meu corpo ainda está processando ontem”  
-“não preciso acelerar hoje”  
-“posso ir mais devagar”  
-
-👉 Observe sem responder mentalmente.
+“posso ir devagar hoje”  
+👉 Observar.
 
 Ajustes internos  
 levantar com mais tempo  
-reduzir estímulos sonoros  
-aceitar um ritmo mais lento  
+ritual simples  
+menos estímulo  
+👉 Recuperar é parte do treino.
 
 O que NÃO é  
 Não é preguiça.  
-Não é desorganização.  
-Não é desistência.
+Não é fracasso.  
+Não é “jogar o dia fora”.
 
 Função interna  
-Permitir que o sistema nervoso saia do modo esforço e entre em modo recuperação ativa.
+Trocar esforço por recuperação ativa.
 
 Frase-resumo  
 Hoje o corpo vem antes da produtividade.
@@ -430,46 +480,52 @@ curiosidade
 leve interesse  
 preguiça mental  
 calma  
+👉 Nomear.
 
 Pensamentos recorrentes  
 “não quero nada pesado”  
 “quero algo que me acompanhe”  
-“não preciso entender tudo”  
+👉 Observar.
 
 Ajustes internos  
-escolher textos curtos  
+textos curtos  
 parar antes de cansar  
-aceitar leitura fragmentada  
+aceitar leitura fragmentada
+
+Se escolher ESCRITA (prompts)  
+A) O que meu corpo está pedindo hoje?  
+B) O que eu posso soltar sem culpa?  
+C) 1 cuidado concreto (bem pequeno)  
+D) 1 frase: “Hoje eu respeito _______.”
 
 O que NÃO é  
 Não é estudo técnico.  
-Não é obrigação.  
-Não é cobrança intelectual.
+Não é cobrança.
 
 Função interna  
-Manter a mente ativa sem entrar em modo desempenho.
+Manter a mente viva sem ativar desempenho.
 
 Frase-resumo  
-Hoje a mente passeia, não corre.
+A mente passeia, não corre.
 
 ---
 
 ### 10:00 — Recuperação corporal ativa
 Emoções  
-relaxamento gradual  
-sensação de alongar por dentro  
 alívio  
+relaxamento gradual  
 leve desconforto físico  
+👉 Nomear.
 
 Pensamentos recorrentes  
-“meu corpo pede cuidado”  
 “não preciso provar nada”  
 “isso já é suficiente”  
+👉 Observar.
 
 Ajustes internos  
-reduzir intensidade  
-respeitar limites  
+caminhada leve OU alongamento profundo  
 pausar quando necessário  
+respiração lenta
 
 O que NÃO é  
 Não é treino.  
@@ -477,7 +533,7 @@ Não é superação.
 Não é comparação.
 
 Função interna  
-Ajudar o corpo a se reorganizar sem gerar novo estresse.
+Reorganizar o corpo sem novo estresse.
 
 Frase-resumo  
 Recuperar também é agir.
@@ -487,29 +543,35 @@ Recuperar também é agir.
 ### 14:00 — Pesquisa criativa sem pressão
 Emoções  
 interesse  
-leve dispersão  
+dispersão leve  
 curiosidade aberta  
+👉 Nomear.
 
 Pensamentos recorrentes  
 “isso é interessante”  
 “não preciso usar agora”  
-“posso guardar essa ideia”  
+👉 Observar.
 
 Ajustes internos  
 anotar sem organizar  
 não concluir nada  
-evitar decisões  
+evitar decisões
+
+Mini-roteiro (pra virar repertório)  
+A) 3 links/ideias  
+B) 3 frases do que chamou atenção  
+C) 1 pergunta que ficou  
+D) salvar e sair
 
 O que NÃO é  
 Não é criar projeto.  
-Não é resolver problema.  
 Não é planejar execução.
 
 Função interna  
-Alimentar o repertório sem exigir produção imediata.
+Alimentar repertório sem cobrança.
 
 Frase-resumo  
-Ideias também precisam descansar antes de crescer.
+Ideias descansam antes de crescer.
 
 ---
 
@@ -518,16 +580,17 @@ Emoções
 vontade de silêncio  
 alívio  
 cansaço acumulado  
+👉 Nomear.
 
 Pensamentos recorrentes  
-“já fiz o suficiente hoje”  
+“já fiz o suficiente”  
 “posso desligar”  
-“amanhã continuo”  
+👉 Observar.
 
 Ajustes internos  
-diminuir estímulos visuais  
-evitar telas intensas  
-ritualizar o descanso  
+diminuir estímulos  
+ritualizar descanso (música calma, banho, silêncio)  
+limitar telas
 
 O que NÃO é  
 Não é culpa.  
@@ -535,36 +598,36 @@ Não é fuga.
 Não é improdutividade.
 
 Função interna  
-Encerrar o dia mentalmente antes do sono.
+Fechar o dia mentalmente antes do sono.
 
 Frase-resumo  
-Descansar também é fechar ciclos.
+Descansar é fechar ciclos.
 
 ---
 
 ### 22:30 — Preparação antecipada para dormir
 Emoções  
 sonolência  
-desaceleração  
 segurança  
+desaceleração  
+👉 Nomear.
 
 Pensamentos recorrentes  
 “o dia terminou”  
-“não preciso revisar nada”  
 “o corpo sabe dormir”  
+👉 Observar.
 
 Ajustes internos  
 luz baixa  
 ritmo lento  
-constância  
+constância
 
 O que NÃO é  
 Não é checar mensagens.  
-Não é repassar o dia.  
-Não é antecipar amanhã.
+Não é repassar o dia.
 
 Função interna  
-Ensinar o corpo a reconhecer o fim do dia com clareza.
+Ensinar o corpo a reconhecer o fim do dia.
 
 Frase-resumo  
 Dormir bem começa antes de deitar.
@@ -573,87 +636,77 @@ Dormir bem começa antes de deitar.
 
 ### 06:00 — Rotina matinal tranquila
 Emoções  
-sensação de meio da semana  
-leve cansaço acumulado  
+cansaço leve  
 neutralidade  
 presença gradual  
-
-👉 Apenas nomear. Não analisar.
+👉 Nomear.
 
 Pensamentos recorrentes  
-“já estou no meio do caminho”  
-“não é começo nem fim”  
 “posso ajustar o ritmo”  
+“não é começo nem fim”  
+👉 Observar.
 
 Ajustes internos  
 manter o básico  
 evitar pressa  
-não antecipar o resto do dia  
+não antecipar o resto do dia
 
 O que NÃO é  
-Não é planejar a semana.  
-Não é avaliar desempenho.  
+Não é avaliar a semana.  
 Não é cobrança.
 
 Função interna  
-Criar estabilidade antes de entrar em conteúdos mais profundos do dia.
+Estabilizar antes de aprofundar.
 
 Frase-resumo  
-Antes de ajustar a rota, estabilize o ponto atual.
+Estabilidade antes de profundidade.
 
 ---
 
-### 07:50 — Escrita reflexiva
+### 07:50 — Escrita reflexiva (correção de rota)
 Emoções  
-tensão leve  
-curiosidade interna  
-irritação sutil  
-clareza pontual  
-vazio produtivo  
+O que eu senti com mais frequência desde segunda?  
+tensão  
+curiosidade  
+cansaço  
+empolgação  
+irritação  
+vazio  
 tranquilidade  
-
 👉 Não explicar. Só nomear.
 
-Pensamentos recorrentes  
+2️⃣ Pensamentos recorrentes  
+Que ideias ou preocupações ficaram voltando?  
 “estou exigindo demais de mim”  
-“isso não faz sentido agora”  
+“isso não faz sentido”  
 “isso me anima”  
 “preciso de mais silêncio”  
-“isso não é prioridade”  
-
+“isso não é prioridade agora”  
 👉 Aqui você observa, não resolve.
 
-Ajustes internos  
-reduzir cobrança em algo específico  
+3️⃣ Ajustes internos  
+O que precisa mudar levemente para a semana continuar saudável?  
+reduzir cobrança em X  
 dormir um pouco mais  
 mover uma tarefa de lugar  
 respeitar mais o descanso  
-parar de insistir no que não flui  
-
+parar de insistir em algo que não está fluindo  
 👉 São microajustes, não decisões grandes.
 
-O que NÃO é  
+🚫 O que NÃO é  
 ❌ Não é desabafo longo  
 ❌ Não é reviver passado  
 ❌ Não é se julgar  
 ❌ Não é resolver a vida  
+É observar e alinhar, só isso.
 
-Função interna  
-Correção de rota emocional e mental enquanto ainda há semana pela frente.
-
-Por que isso está na quarta-feira  
-Segunda e terça ainda estão “quentes”.  
+🧠 Por que isso está na quarta-feira?  
+Segunda e terça ainda estão “no calor”.  
 Sexta já é fechamento.  
-Quarta é o ponto ideal de ajuste fino.  
+Quarta é o ponto ideal para correção de rota.  
+Ela prepara o terreno para: terapia, criação, relacionamentos.
 
-Ela prepara o terreno para  
-a terapia  
-a criação  
-os relacionamentos  
-
-Sem isso, você carrega coisas que não são mais do momento atual.
-
-Frase-resumo  
+🧩 Frase-resumo  
 Escrita reflexiva é olhar para dentro sem se afundar, só para alinhar.
 
 ---
@@ -663,27 +716,27 @@ Emoções
 energia retomando  
 descarga de tensão  
 foco corporal  
+👉 Nomear.
 
 Pensamentos recorrentes  
-“meu corpo responde quando eu cuido”  
-“não preciso forçar hoje”  
 “o movimento organiza a mente”  
+“não preciso forçar hoje”  
+👉 Observar.
 
 Ajustes internos  
-respeitar limites  
 regular intensidade  
-usar o treino como regulador, não como meta  
+respeitar sinais físicos  
+desacelerar no fim
 
 O que NÃO é  
-Não é competição.  
-Não é compensação emocional.  
-Não é punição.
+Não é punição.  
+Não é compensação emocional.
 
 Função interna  
-Regular o sistema nervoso após a escrita reflexiva.
+Ajudar o corpo a digerir o que foi visto na escrita.
 
 Frase-resumo  
-O corpo ajuda a mente a digerir o que foi visto.
+O corpo processa o que a mente abriu.
 
 ---
 
@@ -692,57 +745,56 @@ Emoções
 vulnerabilidade  
 resistência leve  
 expectativa  
-alívio possível  
+👉 Nomear.
 
 Pensamentos recorrentes  
 “não sei por onde começar”  
-“isso é importante”  
 “posso falar no meu ritmo”  
+👉 Observar.
 
 Ajustes internos  
 não preparar discurso  
 aceitar pausas  
-confiar no processo  
+confiar no processo
 
 O que NÃO é  
 Não é performance.  
-Não é agradar o terapeuta.  
-Não é ter respostas prontas.
+Não é agradar.
 
 Função interna  
-Aprofundar o que foi observado pela manhã com suporte externo.
+Aprofundar com suporte externo.
 
 Frase-resumo  
-Na terapia, o ritmo é mais importante que a conclusão.
+Ritmo importa mais que conclusão.
 
 ---
 
-### 15:00 — Digestão da terapia
+### 15:00 — Digestão da terapia (silêncio / caminhada leve)
 Emoções  
-cansaço  
 sensibilidade  
+cansaço  
 silêncio interno  
+👉 Nomear.
 
 Pensamentos recorrentes  
-“isso mexeu comigo”  
 “não preciso entender agora”  
 “posso só sentir”  
+👉 Observar.
 
 Ajustes internos  
 reduzir estímulos  
 evitar conversas profundas  
-permitir descanso mental  
+descanso consciente
 
 O que NÃO é  
 Não é analisar a sessão.  
-Não é tirar conclusões.  
 Não é agir imediatamente.
 
 Função interna  
-Permitir que o conteúdo da terapia se assente sem ruído.
+Deixar assentar.
 
 Frase-resumo  
-Depois de mexer fundo, é preciso deixar assentar.
+Depois de mexer fundo, deixe assentar.
 
 ---
 
@@ -751,176 +803,174 @@ Emoções
 presença  
 leveza  
 cautela social  
+👉 Nomear.
 
 Pensamentos recorrentes  
 “não preciso render”  
 “posso ser simples”  
-“menos expectativa ajuda”  
+👉 Observar.
 
 Ajustes internos  
-escolher ambientes tranquilos  
+ambientes tranquilos  
 limitar duração  
-priorizar conforto  
+priorizar conforto
 
 O que NÃO é  
 Não é provar conexão.  
-Não é criar intimidade forçada.  
-Não é resolver relações.
+Não é intimidade forçada.
 
 Função interna  
-Reintroduzir o contato com o mundo sem sobrecarga.
+Reintroduzir o mundo sem sobrecarga.
 
 Frase-resumo  
-Conexão também pode ser leve.
+Conexão pode ser leve.
 
 ---
 
 ### 23:00 — Preparação para dormir
 Emoções  
-exaustão boa  
 alívio  
+exaustão boa  
 desligamento gradual  
+👉 Nomear.
 
 Pensamentos recorrentes  
 “hoje foi suficiente”  
-“não preciso fechar tudo”  
-“amanhã continuo”  
+👉 Observar.
 
 Ajustes internos  
 rotina previsível  
-luz baixa  
-menos estímulo  
+menos estímulo
 
 O que NÃO é  
-Não é revisar o dia.  
-Não é planejar amanhã.  
-Não é buscar distração.
+Não é revisar o dia.
 
 Função interna  
 Fechar um dia intenso com segurança.
 
 Frase-resumo  
-Depois de ajustar a rota, o descanso consolida.
+Descanso consolida ajustes.
 
 ## Quinta-feira
 
-### 06:00 — Acordar, café e ativação leve do corpo
+### 06:00 — Acordar + café + ativação leve
 Emoções  
-sonolência residual  
 estabilidade  
-leve motivação  
-corpo despertando  
-
-👉 Apenas nomear. Não interpretar.
+motivação leve  
+sonolência residual  
+👉 Nomear.
 
 Pensamentos recorrentes  
 “hoje consigo focar melhor”  
-“não preciso correr”  
-“o corpo acorda antes da mente”  
+👉 Observar.
 
 Ajustes internos  
-ativar o corpo sem acelerar  
-manter ritual simples  
-evitar excesso de informação  
+ritual simples  
+sem excesso de informação
 
 O que NÃO é  
-Não é checar pendências.  
-Não é planejar criação.  
-Não é antecipar resultados.
+Não é checar pendências cedo.
 
 Função interna  
-Preparar o terreno físico e mental para um dia de foco mais profundo.
+Preparar base para foco profundo.
 
 Frase-resumo  
-O foco nasce da estabilidade, não da pressa.
+Foco nasce da estabilidade.
 
 ---
 
-### 07:50 — Aprendizado técnico
+### 07:50 — Aprendizado técnico (estudo estratégico)
 Emoções  
 curiosidade  
-leve frustração possível  
+frustração possível  
 engajamento mental  
+👉 Nomear.
 
 Pensamentos recorrentes  
-“isso é complexo, mas interessante”  
-“não preciso entender tudo agora”  
+“isso é complexo”  
 “posso aprender em camadas”  
+👉 Observar.
 
 Ajustes internos  
-limitar tempo de estudo  
-priorizar compreensão, não volume  
-aceitar dúvidas abertas  
+limitar tempo  
+priorizar entendimento  
+aceitar dúvidas abertas
+
+Se for ESCRITA (registro técnico)  
+A) O que aprendi hoje (3 bullets)  
+B) O que ainda não entendi (3 dúvidas)  
+C) Onde isso se conecta com meu projeto (1 frase)  
+D) Próximo micro-passo (1 ação)
 
 O que NÃO é  
-Não é produtividade forçada.  
-Não é comparação.  
-Não é cobrança por domínio imediato.
+Não é dominar tudo hoje.
 
 Função interna  
-Alimentar a criação profunda com base sólida, sem exaustão.
+Alimentar criação com base sólida.
 
 Frase-resumo  
-Aprender é preparar o terreno, não construir tudo hoje.
+Aprender é preparar o terreno.
 
 ---
 
 ### 10:00 — Treino físico + corrida
 Emoções  
-energia crescente  
-descarga de tensão  
+energia  
 presença corporal  
+descarga  
+👉 Nomear.
 
 Pensamentos recorrentes  
 “o corpo sustenta o foco”  
-“não preciso exagerar”  
-“movimento limpa a mente”  
+👉 Observar.
 
 Ajustes internos  
 regular intensidade  
-usar respiração como guia  
-respeitar sinais físicos  
+respiração como guia
 
 O que NÃO é  
-Não é bater meta.  
-Não é competir.  
-Não é compensar ansiedade.
+Não é bater meta.
 
 Função interna  
-Manter equilíbrio entre esforço mental e físico.
+Equilibrar mente e corpo para criar melhor.
 
 Frase-resumo  
-O corpo impede que o foco vire rigidez.
+Movimento impede rigidez.
 
 ---
 
-### 14:00 — Criação profunda
+### 14:00 — Criação profunda (foco total em um conceito)
 Emoções  
 imersão  
 resistência inicial  
 clareza progressiva  
-fluxo possível  
+👉 Nomear.
 
 Pensamentos recorrentes  
-“é aqui que preciso ficar”  
 “uma coisa de cada vez”  
 “menos distração ajuda”  
+👉 Observar.
 
 Ajustes internos  
-definir um único foco  
-limitar interrupções  
-aceitar imperfeição  
+definir 1 foco  
+tirar interrupções  
+aceitar imperfeição
+
+Mini-roteiro (pra manter o fluxo)  
+A) Objetivo do bloco (1 frase)  
+B) O que vou ignorar hoje (lista curta)  
+C) Execução (45–90 min)  
+D) Fechamento: “próximo passo simples” (1 linha)
 
 O que NÃO é  
 Não é multitarefa.  
-Não é finalizar tudo.  
-Não é buscar validação.
+Não é finalizar tudo.
 
 Função interna  
-Transformar aprendizado em algo vivo, mesmo que inacabado.
+Transformar repertório em algo vivo.
 
 Frase-resumo  
-Criação profunda pede presença, não pressa.
+Presença cria profundidade.
 
 ---
 
@@ -929,27 +979,24 @@ Emoções
 descompressão  
 afeto simples  
 cansaço saudável  
+👉 Nomear.
 
 Pensamentos recorrentes  
-“não preciso performar”  
 “posso só estar”  
-“leveza também é cuidado”  
+👉 Observar.
 
 Ajustes internos  
 escolher companhia segura  
-limitar expectativas  
-priorizar conforto  
+limitar expectativa
 
 O que NÃO é  
-Não é resolver vínculos.  
-Não é conversa pesada.  
-Não é sobre futuro.
+Não é conversa pesada.
 
 Função interna  
-Encerrar o dia criativo sem ruptura brusca.
+Fechar o dia criativo sem ruptura.
 
 Frase-resumo  
-Depois do foco, a leveza restaura.
+Leveza restaura.
 
 ---
 
@@ -957,147 +1004,161 @@ Depois do foco, a leveza restaura.
 Emoções  
 desligamento  
 satisfação silenciosa  
-exaustão boa  
+👉 Nomear.
 
 Pensamentos recorrentes  
-“hoje foi suficiente”  
 “o processo continua amanhã”  
+👉 Observar.
 
 Ajustes internos  
 ritual previsível  
-reduzir estímulos  
-respeitar o cansaço  
+reduzir telas
 
 O que NÃO é  
-Não é revisar criação.  
-Não é planejar sexta.  
-Não é consumir conteúdo.
+Não é revisar criação na cama.
 
 Função interna  
-Consolidar o que foi criado e aprendido.
+Consolidar aprendizado e criação.
 
 Frase-resumo  
-O descanso é parte do trabalho profundo.
+O descanso é parte do trabalho.
 
 ## Sexta-feira
 
 ### 06:00 — Início consciente do dia
 Emoções  
-leve cansaço acumulado  
-alívio por chegar ao fim da semana  
+cansaço acumulado  
+alívio  
 estabilidade  
-expectativa moderada  
-
-👉 Apenas nomear. Não avaliar.
+👉 Nomear.
 
 Pensamentos recorrentes  
 “cheguei até aqui”  
 “não preciso provar nada hoje”  
-“o ritmo pode ser mais humano”  
+👉 Observar.
 
 Ajustes internos  
-reduzir pressa matinal  
-manter rituais simples  
-não antecipar o fim de semana  
+ritual simples  
+reduzir pressa
 
 O que NÃO é  
-Não é acelerar tarefas.  
-Não é compensar atrasos.  
-Não é planejar tudo de uma vez.
+Não é compensar atrasos.
 
 Função interna  
-Começar o fechamento da semana sem colapsar energia.
+Começar o fechamento sem colapsar energia.
 
 Frase-resumo  
-Encerrar bem começa logo cedo.
+Encerrar bem começa cedo.
 
 ---
 
-### 07:50 — Organizar a semana (revisão)
+### 07:50 — Organizar a semana (revisão guiada por escrita)
 Emoções  
 clareza gradual  
 leve confusão inicial  
 satisfação ao reconhecer avanços  
+👉 Nomear.
 
 Pensamentos recorrentes  
 “isso funcionou”  
 “isso não funcionou e tudo bem”  
 “aprendi algo aqui”  
+👉 Observar.
 
 Ajustes internos  
 anotar sem julgar  
 separar fatos de opiniões  
-não reescrever a semana  
+não reescrever a semana
+
+ESCRITA (modelo A/B/C/D)  
+A) Revisar avanços da semana  
+- 5 avanços (pequenos contam)  
+- 1 coisa que mantive mesmo com resistência
+
+B) Lista de pendências da semana  
+- até 7 pendências  
+- marcar: (Rápida) / (Média) / (Chata)  
+- escolher só 2 prioridades reais
+
+C) Aprendizados e insights  
+- 3 aprendizados sobre você  
+- 3 aprendizados sobre rotina/energia  
+- 1 insight que vale repetir
+
+D) Frase de fechamento  
+- “Esta semana eu _______. Na próxima eu _______.”
 
 O que NÃO é  
 Não é autocrítica.  
-Não é planejamento futuro detalhado.  
-Não é cobrança por perfeição.
+Não é se punir.  
+Não é planejamento detalhado do futuro.
 
 Função interna  
-Transformar a semana vivida em aprendizado consciente.
+Transformar semana vivida em aprendizado consciente.
 
 Frase-resumo  
 Revisar é colher, não se cobrar.
 
 ---
 
-### 10:00 — Treino físico + corrida
+### 10:00 — Treino físico + corrida (fechar ciclo no corpo)
 Emoções  
 descarga  
-resiliência  
-presença corporal  
 alívio mental  
+presença corporal  
+👉 Nomear.
 
 Pensamentos recorrentes  
-“o corpo aguenta”  
-“não preciso ir além”  
 “fechar a semana no corpo ajuda”  
+👉 Observar.
 
 Ajustes internos  
-regular intensidade  
-priorizar constância  
-evitar competição interna  
+intensidade humana  
+constância > performance
 
 O que NÃO é  
-Não é superar limites.  
-Não é punição.  
-Não é buscar performance máxima.
+Não é superação extrema.
 
 Função interna  
-Encerrar o ciclo semanal físico, liberando tensão acumulada.
+Liberar tensão acumulada.
 
 Frase-resumo  
-O corpo fecha ciclos que a mente não fecha sozinha.
+O corpo fecha ciclos.
 
 ---
 
-### 16:00 — Encerramento produtivo
+### 16:00 — Encerramento produtivo (fechar a mente)
 Emoções  
 alívio  
-leve resistência  
+resistência leve  
 organização mental  
+👉 Nomear.
 
 Pensamentos recorrentes  
-“fiz o que foi possível”  
-“algumas coisas ficam para depois”  
+“fiz o que deu”  
 “não preciso carregar isso no fim de semana”  
+👉 Observar.
 
 Ajustes internos  
-listar poucos pontos  
+lista curta  
 aceitar pendências  
-separar controle de excesso  
+parar quando concluir o ritual
+
+ESCRITA (passo a passo)  
+A) 3 avanços do dia (mínimos valem)  
+B) até 3 pendências (só nomear)  
+C) 1 cuidado para o fim de semana  
+D) 1 frase: “Agora eu encerro.”
 
 O que NÃO é  
 Não é lista infinita.  
-Não é reabrir problemas.  
-Não é justificar falhas.
+Não é reabrir problemas.
 
 Função interna  
-Fechar a semana na mente para liberar presença no descanso.
+Desligar o “processador” mental para entrar no descanso.
 
 Frase-resumo  
-Encerrar não é concluir tudo — é parar de carregar.
+Encerrar é parar de carregar.
 
 ---
 
@@ -1106,56 +1167,51 @@ Emoções
 leveza  
 conexão  
 necessidade de descanso  
-prazer simples  
+👉 Nomear.
 
 Pensamentos recorrentes  
-“posso relaxar agora”  
+“posso relaxar”  
 “não preciso render”  
-“estar junto já basta”  
+👉 Observar.
 
 Ajustes internos  
-escolher ambientes seguros  
-limitar estímulos excessivos  
-priorizar conforto  
+ambientes seguros  
+limitar estímulos  
+priorizar conforto
 
 O que NÃO é  
-Não é socialização obrigatória.  
-Não é resolver relações.  
-Não é excesso.
+Não é socialização obrigatória.
 
 Função interna  
-Marcar a transição clara entre semana ativa e descanso.
+Marcar transição para o fim de semana.
 
 Frase-resumo  
-O descanso começa quando a cobrança termina.
+Descanso começa quando a cobrança termina.
 
 ---
 
 ### 23:30 — Dormir
 Emoções  
 desligamento  
-satisfação silenciosa  
 cansaço saudável  
+👉 Nomear.
 
 Pensamentos recorrentes  
 “a semana acabou”  
-“posso soltar agora”  
+👉 Observar.
 
 Ajustes internos  
 ritual previsível  
-reduzir telas  
-respeitar o sono  
+menos telas
 
 O que NÃO é  
-Não é revisar tarefas.  
-Não é planejar sábado.  
-Não é consumir informação.
+Não é planejar sábado na cama.
 
 Função interna  
-Permitir recuperação real para o fim de semana.
+Recuperação real.
 
 Frase-resumo  
-Dormir bem é fechar a semana com dignidade.
+Dormir bem fecha a semana.
 
 ## Sábado
 
@@ -1164,87 +1220,79 @@ Emoções
 tranquilidade  
 preguiça leve  
 alívio  
-descompressão  
-
-👉 Apenas nomear. Não corrigir.
+👉 Nomear.
 
 Pensamentos recorrentes  
-“não tenho horário rígido hoje”  
 “posso começar devagar”  
-“não preciso produzir agora”  
+👉 Observar.
 
 Ajustes internos  
-permitir mais tempo na cama  
-não usar despertador agressivo  
-manter silêncio inicial  
+sem despertador agressivo  
+silêncio inicial
 
 O que NÃO é  
-Não é perder o dia.  
-Não é dormir por fuga.  
-Não é ignorar o corpo.
+Não é perder o dia.
 
 Função interna  
-Quebrar o padrão automático de produtividade e entrar em modo humano.
+Quebrar modo automático de produtividade.
 
 Frase-resumo  
-Descansar também é uma ação consciente.
+Descansar é ação consciente.
 
 ---
 
 ### 10:00 — Treino físico + corrida (sem cobrança)
 Emoções  
-liberação  
 prazer corporal  
 energia limpa  
 leve desafio  
+👉 Nomear.
 
 Pensamentos recorrentes  
-“movimento me faz bem”  
-“não preciso provar nada”  
 “o corpo guia hoje”  
+👉 Observar.
 
 Ajustes internos  
-reduzir intensidade se necessário  
 seguir sensação corporal  
-parar antes do esgotamento  
+parar antes do esgotamento
 
 O que NÃO é  
-Não é treino de desempenho.  
-Não é compensar excessos.  
-Não é comparação.
+Não é desempenho.
 
 Função interna  
-Manter o corpo vivo sem ativar o modo cobrança.
+Cuidado físico sem ativar cobrança.
 
 Frase-resumo  
-Movimento no sábado é cuidado, não obrigação.
+Movimento no sábado é cuidado.
 
 ---
 
 ### 15:00 — Tempo livre criativo ou social
 Emoções  
 curiosidade  
-leve dispersão  
 entusiasmo espontâneo  
-conexão  
+dispersão leve  
+👉 Nomear.
 
 Pensamentos recorrentes  
 “o que me dá vontade agora?”  
-“isso me diverte”  
-“não preciso terminar nada”  
+👉 Observar.
 
 Ajustes internos  
 escolher pelo prazer  
-evitar multitarefa  
-seguir interesse real  
+evitar multitarefa
+
+Se virar ESCRITA (registro criativo)  
+A) O que me deu prazer hoje?  
+B) O que eu queria repetir na próxima semana?  
+C) O que eu não quero mais forçar?  
+D) 1 frase: “Eu me permito _______.”
 
 O que NÃO é  
-Não é produtividade disfarçada.  
-Não é planejamento futuro.  
-Não é cobrança de resultado.
+Não é produtividade disfarçada.
 
 Função interna  
-Reconectar com desejo genuíno e criatividade não utilitária.
+Reconectar com desejo genuíno.
 
 Frase-resumo  
 Criar por prazer reorganiza a mente.
@@ -1256,25 +1304,21 @@ Emoções
 acolhimento  
 presença  
 relaxamento  
-vínculo  
+👉 Nomear.
 
 Pensamentos recorrentes  
-“posso estar aqui inteiro”  
-“não preciso resolver nada”  
 “estar junto já basta”  
+👉 Observar.
 
 Ajustes internos  
-escolher ambientes seguros  
-respeitar limites sociais  
-priorizar conforto emocional  
+limitar exposição  
+respeitar cansaço social
 
 O que NÃO é  
-Não é performance social.  
-Não é conversa difícil.  
-Não é exposição excessiva.
+Não é performance.
 
 Função interna  
-Fortalecer vínculos sem desgaste emocional.
+Vínculo sem desgaste.
 
 Frase-resumo  
 Presença vale mais que intensidade.
@@ -1283,29 +1327,25 @@ Presença vale mais que intensidade.
 
 ### 00:00 — Sono
 Emoções  
-desligamento  
-satisfação  
 calma  
+desligamento  
+👉 Nomear.
 
 Pensamentos recorrentes  
 “o dia foi suficiente”  
-“posso descansar”  
+👉 Observar.
 
 Ajustes internos  
-ritual simples  
-luz baixa  
-desaceleração gradual  
+desaceleração gradual
 
 O que NÃO é  
-Não é consumo de estímulo até cair.  
-Não é revisar semana.  
-Não é antecipar domingo.
+Não é estímulo até cair.
 
 Função interna  
-Permitir recuperação plena sem pressão.
+Recuperar sem pressão.
 
 Frase-resumo  
-Dormir bem sustenta o domingo.
+Dormir sustenta o domingo.
 
 ## Domingo
 
@@ -1314,57 +1354,48 @@ Emoções
 calma  
 neutralidade  
 leve melancolia  
-presença  
-
-👉 Apenas nomear. Não interpretar.
+👉 Nomear.
 
 Pensamentos recorrentes  
 “o dia é mais lento”  
-“não preciso correr”  
-“posso ouvir o corpo”  
+👉 Observar.
 
 Ajustes internos  
-acordar sem alarme rígido  
-evitar notícias  
-manter silêncio inicial  
+evitar notícias cedo  
+silêncio inicial
 
 O que NÃO é  
-Não é dormir por exaustão.  
-Não é evitar o dia.  
-Não é antecipar problemas da semana.
+Não é antecipar problemas.
 
 Função interna  
-Marcar a transição consciente entre descanso e integração.
+Integração do descanso.
 
 Frase-resumo  
-O domingo começa sem urgência.
+Domingo começa sem urgência.
 
 ---
 
-### 10:00 — Caminhada leve, alongamento ou contato com a natureza
+### 10:00 — Caminhada leve / alongamento / natureza
 Emoções  
 leveza  
-equilíbrio  
 aterramento  
 clareza  
+👉 Nomear.
 
 Pensamentos recorrentes  
-“meu corpo sabe o ritmo”  
-“não preciso ir longe”  
 “isso me organiza por dentro”  
+👉 Observar.
 
 Ajustes internos  
 movimento lento  
-atenção à respiração  
-olhar o ambiente  
+respiração como âncora  
+olhar o ambiente
 
 O que NÃO é  
-Não é exercício formal.  
-Não é meta de desempenho.  
-Não é distração automática.
+Não é meta de desempenho.
 
 Função interna  
-Ajudar o sistema nervoso a integrar a semana que passou.
+Integrar a semana no corpo.
 
 Frase-resumo  
 Movimento suave organiza o pensamento.
@@ -1375,53 +1406,53 @@ Movimento suave organiza o pensamento.
 Emoções  
 conexão  
 acolhimento  
-conforto  
 presença  
+👉 Nomear.
 
 Pensamentos recorrentes  
-“estar junto já é suficiente”  
 “não preciso conversar o tempo todo”  
-“posso só compartilhar espaço”  
+👉 Observar.
 
 Ajustes internos  
-escolher companhia segura  
-limitar exposição  
-respeitar cansaço social  
+companhia segura  
+limitar exposição
 
 O que NÃO é  
-Não é resolver conflitos.  
-Não é cobrança emocional.  
-Não é exposição excessiva.
+Não é cobrança emocional.
 
 Função interna  
-Nutrir vínculo sem desgaste psíquico.
+Nutrir vínculo sem desgaste.
 
 Frase-resumo  
 Afeto saudável não exige performance.
 
 ---
 
-### 18:00 — Planejamento leve da semana seguinte
+### 18:00 — Planejamento leve da semana seguinte (com escrita)
 Emoções  
 clareza  
-organização  
 leve ansiedade  
-controle saudável  
+organização  
+👉 Nomear.
 
 Pensamentos recorrentes  
 “o que é essencial?”  
 “o que pode esperar?”  
-“o que não cabe essa semana?”  
+👉 Observar.
 
 Ajustes internos  
-listar sem rigidez  
-não lotar a agenda  
-deixar espaços vazios  
+não lotar agenda  
+deixar espaços vazios
+
+ESCRITA (modelo simples)  
+A) 3 prioridades reais (no máximo)  
+B) 3 “não-prioridades” (o que vai ficar de fora)  
+C) 2 blocos de cuidado (sono/descanso/movimento)  
+D) Frase de compromisso: “Nesta semana eu sustento _______.”
 
 O que NÃO é  
 Não é planejamento detalhado.  
-Não é cobrança futura.  
-Não é resolver tudo agora.
+Não é cobrança futura.
 
 Função interna  
 Criar previsibilidade sem ativar pressão.
@@ -1431,237 +1462,252 @@ Planejar leve é proteger a semana.
 
 ---
 
-### 22:30 — Preparação para dormir
+### 22:30 — Preparação para dormir (fechar ciclo semanal)
 Emoções  
 encerramento  
 tranquilidade  
 segurança  
+👉 Nomear.
 
 Pensamentos recorrentes  
 “a semana pode começar organizada”  
-“já fiz o suficiente hoje”  
+👉 Observar.
 
 Ajustes internos  
 luz baixa  
 ritual repetível  
-desligar estímulos  
+desligar estímulos
 
 O que NÃO é  
 Não é revisar erros.  
-Não é antecipar problemas.  
-Não é consumo excessivo de telas.
+Não é antecipar problemas.
 
 Função interna  
 Encerrar o ciclo semanal com estabilidade.
 
 Frase-resumo  
 O descanso de domingo sustenta a semana inteira.
+
 `;
 
-/**
- * Parser e UI (igual ao seu, só trocou o carregamento)
- */
+// ---------- PARSER (## dia / ### hora — título) ----------
+function mdToHtml(md){
+  // remove linhas "—" separadoras
+  const cleaned = md
+    .split("\n")
+    .filter(l => l.trim() !== "---")
+    .join("\n")
+    .trim();
 
-let rotina = [];
-let diaAtual = 0;
-let idAberto = null;
-let travarSwipe = false;
+  // escapa mínimo para evitar quebrar HTML
+  const esc = (s) => s
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;");
+
+  // preserva quebras de linha; duas quebras viram parágrafo
+  const lines = cleaned.split("\n").map(esc);
+
+  // converte Markdown "linha + dois espaços" (quebra forçada) em <br>
+  // aqui a gente simplesmente converte TODA quebra de linha em <br>,
+  // e mantém blocos com linhas vazias como "parágrafo".
+  let html = "";
+  for (let i=0;i<lines.length;i++){
+    const line = lines[i];
+    if (line.trim() === ""){
+      html += "<br>";
+    } else {
+      html += line + "<br>";
+    }
+  }
+
+  // pequenos realces: setinhas e bullets ficam ok como texto
+  return html;
+}
+
+function parseSemana(mdText){
+  const lines = mdText.replaceAll("\r\n","\n").split("\n");
+  const rotina = [];
+  let currentDay = null;
+  let currentTask = null;
+  let buffer = [];
+
+  const flushTask = () => {
+    if (!currentDay || !currentTask) return;
+    currentTask.longa = mdToHtml(buffer.join("\n"));
+    currentDay.tarefas.push(currentTask);
+    currentTask = null;
+    buffer = [];
+  };
+
+  const flushDay = () => {
+    if (!currentDay) return;
+    flushTask();
+    rotina.push(currentDay);
+    currentDay = null;
+  };
+
+  for (const raw of lines){
+    const line = raw.trimEnd();
+
+    const dayMatch = line.match(/^##\s+(.*)$/);
+    if (dayMatch){
+      flushDay();
+      currentDay = { dia: dayMatch[1].trim(), tarefas: [] };
+      continue;
+    }
+
+    const taskMatch = line.match(/^###\s+(\d{2}:\d{2})\s+—\s+(.*)$/);
+    if (taskMatch){
+      flushTask();
+      currentTask = {
+        hora: taskMatch[1],
+        curta: taskMatch[2].trim(),
+        longa: ""
+      };
+      continue;
+    }
+
+    // conteúdo
+    if (currentTask){
+      buffer.push(raw); // preserva espaços finais (ex: "Emoções  ")
+    }
+  }
+
+  flushDay();
+  return rotina;
+}
+
+// ---------- APP ----------
+const rotina = parseSemana(semanaMD);
 
 const tasksDiv = document.getElementById("tasks");
 const dayDiv = document.getElementById("day");
 const hintDiv = document.getElementById("hint");
 
-function escapeHtml(s) {
-  return (s || "")
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;");
+let diaAtual = new Date().getDay() - 1; // seg=0 ... dom=6
+if (diaAtual < 0) diaAtual = 6;
+if (diaAtual >= rotina.length) diaAtual = 0;
+
+function minutos(h){
+  const p = h.split(":");
+  return (parseInt(p[0],10)*60) + parseInt(p[1],10);
 }
 
-function toDetailsHtml(text) {
-  const safe = escapeHtml(text.trim());
-  return safe
-    .replace(/\r/g, "")
-    .replace(/\n{3,}/g, "\n\n")
-    .replace(/\n/g, "<br>");
-}
+function findActiveIndex(dayObj){
+  const now = new Date();
+  const minNow = now.getHours()*60 + now.getMinutes();
 
-function parseTaskHeader(line) {
-  const raw = line.replace(/^###\s*/, "").trim();
-  const m = raw.match(/^(\d{2}:\d{2})\s*[—-]\s*(.+)$/);
-  if (!m) return { hora: "", curta: raw };
-  return { hora: m[1], curta: m[2].trim() };
-}
-
-function parseSemanaMd(md) {
-  const lines = md.replace(/\r/g, "").split("\n");
-
-  const dias = [];
-  let diaAtualObj = null;
-  let tarefaAtual = null;
-
-  function finalizarTarefa() {
-    if (tarefaAtual && diaAtualObj) {
-      tarefaAtual.longa = tarefaAtual._buffer.join("\n").trim();
-      delete tarefaAtual._buffer;
-      diaAtualObj.tarefas.push(tarefaAtual);
-    }
-    tarefaAtual = null;
+  let idx = 0;
+  for (let i=0;i<dayObj.tarefas.length;i++){
+    if (minutos(dayObj.tarefas[i].hora) <= minNow) idx = i;
   }
-
-  function finalizarDia() {
-    finalizarTarefa();
-    if (diaAtualObj) dias.push(diaAtualObj);
-    diaAtualObj = null;
-  }
-
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i];
-
-    if (line.startsWith("## ")) {
-      finalizarDia();
-      diaAtualObj = { dia: line.replace(/^##\s*/, "").trim(), tarefas: [] };
-      continue;
-    }
-
-    if (line.startsWith("### ")) {
-      finalizarTarefa();
-      if (!diaAtualObj) diaAtualObj = { dia: "Dia", tarefas: [] };
-      const { hora, curta } = parseTaskHeader(line);
-      tarefaAtual = { hora, curta, longa: "", _buffer: [] };
-      continue;
-    }
-
-    if (tarefaAtual) {
-      tarefaAtual._buffer.push(line);
-    }
-  }
-
-  finalizarDia();
-  return dias;
+  return idx;
 }
 
-function getDiaIndexHoje() {
-  const hoje = new Date().getDay();
-  const nomes = [
-    "Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira",
-    "Quinta-feira", "Sexta-feira", "Sábado"
-  ];
-
-  const nomeHoje = nomes[hoje];
-  const idx = rotina.findIndex(d => d.dia.toLowerCase().startsWith(nomeHoje.toLowerCase()));
-  return idx >= 0 ? idx : 0;
+function closeAllExcept(keepEl){
+  const all = tasksDiv.querySelectorAll(".task.open");
+  all.forEach(el => { if (el !== keepEl) el.classList.remove("open"); });
 }
 
-function minutos(h) {
-  const p = (h || "00:00").split(":");
-  return parseInt(p[0] || "0") * 60 + parseInt(p[1] || "0");
-}
-
-function getTarefaAtivaIndex() {
-  if (!rotina[diaAtual] || !rotina[diaAtual].tarefas.length) return -1;
-
-  const agora = new Date();
-  const minAgora = agora.getHours() * 60 + agora.getMinutes();
-
-  let ativa = 0;
-  rotina[diaAtual].tarefas.forEach((t, i) => {
-    if (minutos(t.hora) <= minAgora) ativa = i;
-  });
-  return ativa;
-}
-
-function render(autoOpenNow = true) {
+function render(){
   tasksDiv.innerHTML = "";
+  const dayObj = rotina[diaAtual];
+  dayDiv.textContent = dayObj?.dia ?? "Dia";
+  hintDiv.textContent = "Dica: clique em uma tarefa para abrir/fechar. Só uma fica aberta por vez.";
 
-  if (!rotina.length) {
-    dayDiv.textContent = "Sem dados";
-    tasksDiv.innerHTML = `<div class="error">
-      Texto da rotina vazio ou inválido.<br><br>
-      ✅ Confirme que existe pelo menos um <b>## Dia</b> e tarefas com <b>### 07:50 — Título</b>.
-    </div>`;
-    return;
-  }
+  // ativa por horário (apenas se for o dia “real” de hoje)
+  const todayIndex = (new Date().getDay() - 1 + 7) % 7;
+  const isToday = (diaAtual === todayIndex);
 
-  dayDiv.textContent = rotina[diaAtual].dia;
+  const activeIndex = isToday ? findActiveIndex(dayObj) : -1;
 
-  const ativaIdx = getTarefaAtivaIndex();
+  dayObj.tarefas.forEach((t, i) => {
+    const card = document.createElement("div");
+    card.className = "task" + (i === activeIndex ? " active" : "");
 
-  rotina[diaAtual].tarefas.forEach((t, i) => {
-    const div = document.createElement("div");
-    const id = `${diaAtual}-${i}`;
-    div.className = "task" + (i === ativaIdx ? " active" : "") + (idAberto === id ? " open" : "");
-
-    const detailsHtml = toDetailsHtml(t.longa || "");
-    div.innerHTML = `
-      <div class="task-header" data-id="${id}">
-        <div class="time">${t.hora || ""}</div>
-        <div class="short">${t.curta || ""}</div>
+    card.innerHTML = `
+      <div class="task-header">
+        <div class="time">${t.hora}</div>
+        <div class="short">${t.curta}</div>
       </div>
-      <div class="details">${detailsHtml || "<i>Sem detalhes neste horário.</i>"}</div>
+      <div class="details">${t.longa}</div>
     `;
 
-    const header = div.querySelector(".task-header");
-    const details = div.querySelector(".details");
+    const header = card.querySelector(".task-header");
+    const details = card.querySelector(".details");
 
-    details.addEventListener("touchstart", () => { travarSwipe = true; }, { passive: true });
-    details.addEventListener("touchend", () => { setTimeout(() => travarSwipe = false, 120); }, { passive: true });
-    details.addEventListener("wheel", () => { travarSwipe = true; setTimeout(() => travarSwipe = false, 200); });
+    // não fechar ao rolar dentro do details
+    details.addEventListener("touchstart", (e)=> e.stopPropagation(), {passive:true});
+    details.addEventListener("touchmove", (e)=> e.stopPropagation(), {passive:true});
+    details.addEventListener("wheel", (e)=> e.stopPropagation(), {passive:true});
 
-    header.onclick = () => {
-      idAberto = (idAberto === id) ? null : id;
-      render(false);
-    };
+    header.addEventListener("click", () => {
+      const willOpen = !card.classList.contains("open");
+      closeAllExcept(card);
+      card.classList.toggle("open", willOpen);
+      if (willOpen) details.scrollTop = 0;
+    });
 
-    tasksDiv.appendChild(div);
+    tasksDiv.appendChild(card);
   });
 
-  if (autoOpenNow && ativaIdx >= 0) {
-    idAberto = `${diaAtual}-${ativaIdx}`;
-    setTimeout(() => render(false), 0);
+  // auto-abrir tarefa ativa do dia atual
+  if (activeIndex >= 0){
+    const cards = tasksDiv.querySelectorAll(".task");
+    const activeCard = cards[activeIndex];
+    if (activeCard){
+      closeAllExcept(activeCard);
+      activeCard.classList.add("open");
+      // garante visibilidade
+      activeCard.scrollIntoView({block:"center", behavior:"smooth"});
+    }
   }
 }
 
-function proximoDia() {
-  if (!rotina.length) return;
+function proximoDia(){
   diaAtual = (diaAtual + 1) % rotina.length;
-  idAberto = null;
-  render(true);
+  render();
 }
 
-function diaAnterior() {
-  if (!rotina.length) return;
+function diaAnterior(){
   diaAtual = (diaAtual + rotina.length - 1) % rotina.length;
-  idAberto = null;
-  render(true);
+  render();
 }
 
+document.getElementById("prevBtn").addEventListener("click", diaAnterior);
+document.getElementById("nextBtn").addEventListener("click", proximoDia);
+
+// swipe seguro (não interfere com scroll vertical)
 let startX = 0;
-document.body.addEventListener("touchstart", e => {
-  startX = e.changedTouches[0].screenX;
-}, { passive: true });
+let startY = 0;
+document.body.addEventListener("touchstart", (e) => {
+  const t = e.changedTouches[0];
+  startX = t.screenX;
+  startY = t.screenY;
+}, {passive:true});
 
-document.body.addEventListener("touchend", e => {
-  if (travarSwipe) return;
-  const diff = e.changedTouches[0].screenX - startX;
-  if (diff > 50) diaAnterior();
-  if (diff < -50) proximoDia();
-}, { passive: true });
+document.body.addEventListener("touchend", (e) => {
+  const t = e.changedTouches[0];
+  const dx = t.screenX - startX;
+  const dy = t.screenY - startY;
 
+  // só troca dia se o gesto foi mais horizontal do que vertical
+  if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.2){
+    if (dx > 0) diaAnterior();
+    else proximoDia();
+  }
+}, {passive:true});
+
+// setas do teclado (PC)
 document.addEventListener("keydown", (e) => {
   if (e.key === "ArrowLeft") diaAnterior();
   if (e.key === "ArrowRight") proximoDia();
 });
 
-function iniciar() {
-  rotina = parseSemanaMd(SEMANA_MD);
-  hintDiv.textContent = "Toque em um horário para abrir os detalhes. Setas do teclado funcionam no PC.";
-  diaAtual = getDiaIndexHoje();
-  render(true);
-}
-
-iniciar();
+// atualizar destaque automático a cada minuto
+render();
+setInterval(render, 60000);
 </script>
-
 </body>
 </html>
